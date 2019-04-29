@@ -13,14 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: create nokia directory
-  file:
-    path: /usr/libexec/nokia/tmp
-    state: directory
-    mode: 0700
-  become: true
-  become_user: "root"
-
 - name: create the /etc/openssl directory
   file:
     path: "/etc/openssl"
@@ -82,11 +74,11 @@
     state: present
   become_user: "root"
 
-- name: adding acl for cloud_admin_user for /usr/libexec/nokia/merge_image.sh
+- name: adding acl for cloud_admin_user for merge_image.sh
   acl:
     entity: "{{ users.admin_user_name }}"
     etype: user
-    path: "/usr/libexec/nokia/merge_image.sh"
+    path: "{{ caas.libexec_dir }}/merge_image.sh"
     permissions: "rx"
     recursive: yes
     state: present

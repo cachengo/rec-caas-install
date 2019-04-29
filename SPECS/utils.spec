@@ -16,7 +16,6 @@
 %define RPM_NAME caas-%{COMPONENT}
 %define RPM_MAJOR_VERSION 1.0.0
 %define RPM_MINOR_VERSION 1
-%define LIBEXEC_DIR /usr/libexec/nokia/
 %define KUBELET_PLUGINS_LOGDIR /var/log/kubelet-plugins/
 
 Name:           %{RPM_NAME}
@@ -40,24 +39,24 @@ This rpm contains the supplementary utils for caas subsystem.
 %build
 
 %install
-mkdir -p %{buildroot}/%{LIBEXEC_DIR}/
+mkdir -p %{buildroot}/%{_caas_libexec_path}/
 # --------------------------- LOG
 mkdir -p %{buildroot}/etc/logrotate.d/
 install -m 0640 utils/log/kubelet-plugins %{buildroot}/etc/logrotate.d/
 sed -i -e 's|{{ kubelet_plugings_log_dir }}|%{KUBELET_PLUGINS_LOGDIR}|g' %{buildroot}/etc/logrotate.d/kubelet-plugins
 # --------------------------- DEPLOY
-install -m 0700 utils/deploy/merge_image.sh %{buildroot}/%{LIBEXEC_DIR}/
+install -m 0700 utils/deploy/merge_image.sh %{buildroot}/%{_caas_libexec_path}/
 mkdir -p %{buildroot}/etc/systemd/system/
 # --------------------------- COMMON
 mkdir -p %{buildroot}/etc/profile.d/
 install -m 0644 utils/common/aliases.sh %{buildroot}/etc/profile.d/
 
 %files
-%{LIBEXEC_DIR}/merge_image.sh
+%{_caas_libexec_path}/merge_image.sh
 /etc/profile.d/aliases.sh
 /etc/logrotate.d/kubelet-plugins
-%exclude %{LIBEXEC_DIR}/*pyc
-%exclude %{LIBEXEC_DIR}/*pyo
+%exclude %{_caas_libexec_path}/*pyc
+%exclude %{_caas_libexec_path}/*pyo
 
 %preun
 

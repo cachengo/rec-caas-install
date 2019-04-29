@@ -23,6 +23,7 @@ caas_base_directory: "/var/lib/caas"
 infra_containers_directory: "{{ caas_base_directory }}/images"
 manifests_directory: "{{ caas_base_directory }}/manifests"
 registry_directory: /var/lib/registry
+libexec_dir: /usr/libexec/caas
 apiserver_in_hosts: apiserver.{{ dns_domain }}
 etcd_api_port: 4111
 etcd_peer_port: 4112

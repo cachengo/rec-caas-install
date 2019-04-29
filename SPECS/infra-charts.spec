@@ -16,7 +16,6 @@
 %define RPM_NAME caas-%{COMPONENT}
 %define RPM_MAJOR_VERSION 1.0.0
 %define RPM_MINOR_VERSION 1
-%define CHART_DIR /var/lib/caas/infra-charts/
 
 Name:           %{RPM_NAME}
 Version:        %{RPM_MAJOR_VERSION}
@@ -43,13 +42,13 @@ mkdir -p %{buildroot}/%{_roles_path}/
 rsync -av ansible/roles/install_caas_infra %{buildroot}/%{_roles_path}/
 rsync -av ansible/roles/pre_install_caas_infra %{buildroot}/%{_roles_path}/
 
-mkdir -p %{buildroot}/%{CHART_DIR}/
-rsync -av infra-charts/* %{buildroot}/%{CHART_DIR}/
+mkdir -p %{buildroot}/%{_caas_chart_path}/
+rsync -av infra-charts/* %{buildroot}/%{_caas_chart_path}/
 
 %files
 %{_playbooks_path}/*
 %{_roles_path}/*
-%{CHART_DIR}/*
+%{_caas_chart_path}/*
 
 
 %preun

@@ -57,26 +57,37 @@ rsync -av ansible/roles/manifests %{buildroot}/%{_roles_path}/
 rsync -av ansible/roles/nodeconf %{buildroot}/%{_roles_path}/
 rsync -av ansible/roles/pre_config_all %{buildroot}/%{_roles_path}/
 
-mkdir -p %{buildroot}%_platform_etc_path/playbooks/bootstrapping/
+mkdir -p %{buildroot}%/%{_bootstrapping_path}/
 
-mkdir -p %{buildroot}%/etc/lcm/playbooks/installation/provisioning/
+mkdir -p %{buildroot}%/%{_provisioning_path}/
 
-mkdir -p %{buildroot}/etc/ansible/roles/plugins/filter/
-rsync -av ansible/filter_plugins/* %{buildroot}/etc/ansible/roles/plugins/filter/
+mkdir -p %{buildroot}/%{_ansible_filter_plugins_path}/
+rsync -av ansible/filter_plugins/* %{buildroot}/%{_ansible_filter_plugins_path}/
 
-mkdir -p %{buildroot}/etc/ansible/roles/plugins/library/
-rsync -av ansible/library/* %{buildroot}/etc/ansible/roles/plugins/library/
+mkdir -p %{buildroot}/%{_ansible_modules_path}/
+rsync -av ansible/library/* %{buildroot}/%{_ansible_modules_path}/
 
-mkdir -p %{buildroot}/etc/cmframework/config
-rsync -av cm_config/caas.yaml %{buildroot}/etc/cmframework/config/caas.yaml
+mkdir -p %{buildroot}/%{_cm_config_dir}
+rsync -av cm_config/caas.yaml %{buildroot}/%{_cm_caas_config_file}
 
+# Set build variable to CaaS config
+## Rename variable
+sed -ri 's/^crf_chart_path/caas_chart_path/' %{buildroot}/%{_cm_caas_config_file}
+
+## Set config values
+sed -ri '/^caas_base_directory/{s|:.*|: %{_caas_path}|}'                       %{buildroot}/%{_cm_caas_config_file}
+sed -ri '/^infra_containers_directory/{s|:.*|: %{_caas_container_tar_path}|}'  %{buildroot}/%{_cm_caas_config_file}
+sed -ri '/^manifests_directory/{s|:.*|: %{_caas_manifest_path}|}'              %{buildroot}/%{_cm_caas_config_file}
+sed -ri '/^rbac_manifests_directory/{s|:.*|: %{_caas_rbac_manifests_path}|}'   %{buildroot}/%{_cm_caas_config_file}
+sed -ri '/^caas_chart_path/{s|:.*|: %{_caas_chart_path}|}'                     %{buildroot}/%{_cm_caas_config_file}
+sed -ri '/^libexec_dir/{s|:.*|: %{_caas_libexec_path}|}'                       %{buildroot}/%{_cm_caas_config_file}
 
 %files
 %{_playbooks_path}/*
 %{_roles_path}/*
-/etc/ansible/roles/plugins/filter/*
-/etc/ansible/roles/plugins/library/*
-/etc/cmframework/config/*
+%{_ansible_filter_plugins_path}/*
+%{_ansible_modules_path}/*
+%{_cm_config_dir}/*
 
 
 %preun

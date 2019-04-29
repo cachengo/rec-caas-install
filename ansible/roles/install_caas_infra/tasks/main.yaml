@@ -25,7 +25,7 @@
     chart_file: "{{ lookup('file', '{{ caas.caas_chart_path}}/Chart.yaml') | from_yaml }}"
 
 - name: create chart tgz
-  shell: "tar -C {{ caas.caas_chart_path | dirname }} -cvzf {{ infra_chart_name }}-{{ chart_file.version }}.tgz {{ caas.caas_chart_path | basename }}"
+  shell: "tar -C {{ caas.caas_chart_path.rstrip('/') | dirname }} -cvzf {{ infra_chart_name }}-{{ chart_file.version }}.tgz {{ caas.caas_chart_path.rstrip('/') | basename }}"
 
 - name: upload individual charts to chart repo
   shell: "curl -sS -XPOST -H 'Content-Type: application/gzip' --data-binary @{{ infra_chart_name }}-{{ chart_file.version }}.tgz {{ caas.chart_repo }}/charts/{{ infra_chart_name }}-{{ chart_file.version }}.tgz"

@@ -1,0 +1,63 @@
+{#
+Copyright 2019 Nokia
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+#}
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com
+After=network.target docker.socket
+Requires=docker.socket
+Before=kubelet.service
+Wants=kubelet.service
+BindsTo=containerd.service
+
+[Service]
+Slice=podruntime.slice
+MemoryAccounting=true
+CPUAccounting=true
+BlockIOAccounting=true
+TasksAccounting=true
+Type=notify
+EnvironmentFile=-/etc/sysconfig/docker-storage
+EnvironmentFile=-/etc/sysconfig/docker-proxy
+ExecStart=/usr/bin/dockerd -H  fd:// \
+                           -H tcp://{{ ansible_host }}:2375 \
+                           --max-concurrent-downloads 10 \
+                           --max-concurrent-uploads 10 \
+                           --data-root {{ caas.docker_directory }} \
+                           --tlsverify \
+                           --tlscacert=/etc/docker/ca.pem \
+                           --tlscert=/etc/docker/cert.pem \
+                           --tlskey=/etc/docker/key.pem \
+                           --log-driver=json-file \
+                           --log-opt max-size=1g \
+                           --log-opt max-file=4 \
+                           --ip-forward=false \
+                           --live-restore=true \
+                           --bip={{ caas.docker0_cidr | default('172.17.0.1/16', true) }} \
+                           --exec-opt native.cgroupdriver=cgroupfs \
+                           $DOCKER_STORAGE_OPTIONS
+MountFlags=shared
+LimitNOFILE=1048576
+LimitNPROC=1048576
+LimitCORE=infinity
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=1s
+Environment=DOCKER_HOST=tcp://{{ hostname|lower }}:2375
+Environment=DOCKER_TLS_VERIFY=1
+Environment=DOCKER_CERT_PATH=/etc/docker
+
+[Install]
+WantedBy=multi-user.target

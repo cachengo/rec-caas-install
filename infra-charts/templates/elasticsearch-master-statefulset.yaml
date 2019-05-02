@@ -1,0 +1,108 @@
+{{/*
+Copyright 2019 Nokia
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+{{ if .Values.elasticsearch.required }}
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  labels:
+    app: elasticsearch-master
+    component: "{{ .Values.elasticsearch.master.name }}"
+  name: elasticsearch-master
+  namespace: kube-system
+spec:
+  serviceName: elasticsearch-master
+  replicas: {{ .Values.elasticsearch.master.replicas }}
+  template:
+    metadata:
+      labels:
+        app: elasticsearch-master
+        component: "{{ .Values.elasticsearch.master.name }}"
+      annotations:
+        danm.k8s.io/interfaces: |
+          [
+            {
+              "network":"flannel"
+            }
+          ]
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchLabels:
+                  app: elasticsearch-master
+                  component: "{{ .Values.elasticsearch.master.name }}"
+      nodeSelector:
+        nodetype: caas_master
+      containers:
+      - name: elasticsearch-master
+        env:
+        - name: NODE_DATA
+          value: "false"
+        - name: DISCOVERY_SERVICE
+          value: elasticsearch-data.kube-system.svc.nokia.net
+        - name: ES_JAVA_OPTS
+          value: "-Xms{{ .Values.elasticsearch.java_heap_request }} -Xmx{{ .Values.elasticsearch.java_heap_max }} -Dmapper.allow_dots_in_name=true"
+        {{- range $key, $value :=  .Values.elasticsearch.cluster.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        resources:
+          limits:
+            memory: "{{ .Values.elasticsearch.memory_limit }}"
+          requests:
+            memory: "{{ .Values.elasticsearch.memory_request }}"
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health?local=true
+            port: {{ .Values.elasticsearch.port }}
+          initialDelaySeconds: 5
+        image: {{ .Values.elasticsearch.image_name }}
+        command: ["/usr/bin/supervisord","-n","-c","/etc/supervisord.conf"]
+        ports:
+        - containerPort: {{ .Values.elasticsearch.port_for_cluster_communication }}
+          name: transport
+        - containerPort: {{ .Values.elasticsearch.port }}
+          name: http
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: data
+        - mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          name: elasticsearch-config
+          subPath: elasticsearch.yml
+        - mountPath: /etc/supervisord.conf
+          name: supervisord-config
+          subPath: supervisord.conf
+      volumes:
+        - name: elasticsearch-config
+          configMap:
+            name: elasticsearch
+            items:
+              - key: elasticsearch.yml
+                path: elasticsearch.yml
+                mode: 0644
+        - name: supervisord-config
+          configMap:
+            name: elasticsearch
+            items:
+              - key: supervisord.conf
+                path: supervisord.conf
+                mode: 0644
+        - name: data
+          emptyDir: {}
+{{ end }}

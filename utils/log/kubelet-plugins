@@ -1,0 +1,32 @@
+{{ kubelet_plugings_log_dir }}/*.log {
+    rotate 20
+    maxage 30
+    missingok
+    compress
+  }
+
+# TODO: clean up config when logrotate 3.10 is available https://superuser.com/questions/1059033/logrotate-wildcard-fails-on-missing-files-with-missingok-and-olddir
+# TODO: check /var/lib/kubelet/plugins/**/*.log with newer version of logrotate
+/var/lib/kubelet/plugins/*log /var/lib/kubelet/plugins/*/*log /var/lib/kubelet/plugins/*/*/*log /var/lib/kubelet/plugins/*/*/*/*log {
+    size 100M
+    missingok
+    copytruncate
+    sharedscripts
+    postrotate
+      rotated_logs="$(find /var/lib/kubelet/plugins -name '*.log.[1-20]')"
+      for file in $rotated_logs; do
+        log_file_name="$(basename $file | sed -r 's/.[0-9]+$//')"
+        mv $file {{ kubelet_plugings_log_dir }}/$log_file_name
+      done
+    endscript
+  }
+
+/var/log/plugin.log /var/log/danm.log {
+    size 15M
+    rotate 10
+    maxage 30
+    missingok
+    compress
+    copytruncate
+    dateext dateformat -%Y-%m-%d-%H-%s
+}

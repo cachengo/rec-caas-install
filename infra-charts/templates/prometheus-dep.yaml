@@ -1,0 +1,94 @@
+{{/*
+Copyright 2019 Nokia
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+{{ if .Values.prometheus.required }}
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ .Values.kubernetes_component_label }}: prometheus
+  template:
+    metadata:
+      labels:
+        {{ .Values.kubernetes_component_label }}: prometheus
+      annotations:
+        prometheus.io/scrape: 'false'
+        danm.k8s.io/interfaces: |
+          [
+            {
+              "network":"flannel"
+            }
+          ]
+    spec:
+      nodeSelector:
+        nodetype: caas_master
+      serviceAccountName: prometheus
+      containers:
+      - name: prometheus
+        image: {{ .Values.registry_url }}/{{ .Values.registry_reponame }}/prometheus:{{ .Values.prometheus.container_version }}
+        command:
+          - /usr/bin/supervisord
+        args:
+          - -c
+          - /etc/prometheus/supervisord.conf
+        ports:
+        - containerPort: {{ .Values.prometheus.port }}
+          protocol: TCP
+        resources:
+          limits:
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /var/run/serving-cert
+          name: prometheus-serving-cert
+          readOnly: true
+        - name: secret-root-ca
+          mountPath: /etc/openssl/ca.pem
+          readOnly: true
+        - mountPath: /etc/prometheus
+          name: prometheus-config
+        livenessProbe:
+          httpGet:
+            path: /api/v1/status/config
+            port: {{ .Values.prometheus.port }}
+            scheme: HTTPS
+          initialDelaySeconds: 3
+          timeoutSeconds: 5
+      volumes:
+        - name: prometheus-serving-cert
+          secret:
+            secretName: prometheus-serving-certs
+        - name: secret-root-ca
+          hostPath:
+            path: /etc/openssl/ca.pem
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config
+            items:
+              - key: prometheus.yml
+                path: prometheus.yml
+                mode: 0644
+              - key: nginx.conf
+                path: nginx.conf
+                mode: 0644
+              - key: supervisord.conf
+                path: supervisord.conf
+                mode: 0644
+{{ end }}

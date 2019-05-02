@@ -1,0 +1,46 @@
+---
+# Copyright 2019 Nokia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- import_tasks: configure_docker.yml
+  become_user: "root"
+
+- name: daemon reload
+  command: /usr/bin/systemctl daemon-reload
+  become_user: "root"
+
+- name: restart docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  become_user: "root"
+
+- name: restart docker socket
+  service:
+    name: docker.socket
+    state: started
+  become_user: "root"
+
+- name: make env vars permanent
+  lineinfile:
+    dest: /etc/profile
+    state: present
+    line: "{{ item }}"
+    regexp: "{{ item }}"
+  with_items:
+    - "export DOCKER_HOST=tcp://{{ networking.infra_internal.ip }}:2375"
+    - "export DOCKER_TLS_VERIFY='1'"
+    - "export DOCKER_CERT_PATH=/etc/docker"
+  become_user: "root"

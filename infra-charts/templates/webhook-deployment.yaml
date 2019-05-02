@@ -1,0 +1,63 @@
+{{/*
+Copyright 2019 Nokia
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+{{ if .Values.cpupooler.required }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cpu-dev-pod-mutator-deployment
+  namespace: kube-system
+  labels:
+    {{ .Values.kubernetes_component_label }}: cpu-dev-pod-mutator
+spec:
+  selector:
+    matchLabels:
+      {{ .Values.kubernetes_component_label }}: cpu-dev-pod-mutator
+  template:
+    metadata:
+      annotations:
+        danm.k8s.io/interfaces: |
+          [
+            {
+              "network":"flannel"
+            }
+          ]
+      name: cpu-dev-pod-mutator
+      labels:
+        {{ .Values.kubernetes_component_label }}: cpu-dev-pod-mutator
+    spec:
+      nodeSelector:
+        nodetype: caas_master
+      containers:
+        - name: cpu-dev-pod-mutator
+          image: {{ .Values.registry_url }}/{{ .Values.registry_reponame }}/cpupooler:{{ .Values.cpupooler.container_version }}
+          command: [ "/cpu-device-webhook", "-tls-cert-file=/etc/webhook/certs/cpuwebhook.crt", "-tls-private-key-file=/etc/webhook/certs/cpuwebhook.key", "-alsologtostderr", "-v=4" ]
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+            - name: cpu-pooler-config
+              mountPath: /etc/cpu-pooler
+      volumes:
+        # TODO: make it a secret
+        - name: webhook-certs
+          hostPath:
+            path: /etc/kubernetes/ssl/
+        - name: cpu-pooler-config
+          configMap:
+            name: cpu-pooler-configmap
+{{ end }}

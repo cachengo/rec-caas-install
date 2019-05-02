@@ -1,0 +1,94 @@
+{{/*
+Copyright 2019 Nokia
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+{{ if .Values.custom_metrics_api.required }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.kubernetes_component_label }}: custom-metrics-apiserver
+  name: custom-metrics-apiserver
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ .Values.kubernetes_component_label }}: custom-metrics-apiserver
+  template:
+    metadata:
+      labels:
+        {{ .Values.kubernetes_component_label }}: custom-metrics-apiserver
+      name: custom-metrics-apiserver
+      annotations:
+        danm.k8s.io/interfaces: |
+          [
+            {
+              "network":"flannel"
+            }
+          ]
+    spec:
+      nodeSelector:
+        nodetype: caas_master
+      serviceAccountName: custom-metrics-apiserver
+      containers:
+      - name: custom-metrics-apiserver
+        image: {{ .Values.registry_url }}/{{ .Values.registry_reponame }}/custom_metrics:{{ .Values.custom_metrics_api.container_version }}
+        args:
+        - /adapter
+        - --secure-port={{ .Values.custom_metrics_api.port }}
+        - --tls-cert-file=/var/run/serving-cert/metrics.crt
+        - --tls-private-key-file=/var/run/serving-cert/metrics.key
+        - --logtostderr=true
+        - --prometheus-url={{ .Values.prometheus.prometheus_url }}
+        - --metrics-relist-interval=30s
+        - --discovery-interval=5m
+        - --v=1
+        - --config=/etc/adapter/config.yaml
+        ports:
+        - containerPort: {{ .Values.custom_metrics_api.port }}
+        volumeMounts:
+          - mountPath: /var/run/serving-cert
+            name: volume-serving-cert
+            readOnly: true
+          - name: secrets
+            mountPath: /etc/kubernetes/ssl
+            readOnly: true
+          - name: secret-root-ca
+            mountPath: /etc/ssl/certs/ca.pem
+            readOnly: true
+          - name: auth
+            mountPath: /config
+            readOnly: true
+          - mountPath: /etc/adapter/
+            name: config
+            readOnly: true
+      volumes:
+        - name: volume-serving-cert
+          secret:
+            secretName: cm-adapter-serving-certs
+        - name: secrets
+          hostPath:
+            path: /etc/kubernetes/ssl
+        - name: secret-root-ca
+          hostPath:
+            path: /etc/openssl/ca.pem
+        - name: auth
+          hostPath:
+            path: /etc/kubernetes/kubeconfig
+        - name: config
+          configMap:
+            name: adapter-config
+{{ end }}

@@ -1,0 +1,66 @@
+{{/*
+Copyright 2019 Nokia
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+{{ if .Values.cpupooler.required }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cpu-device-plugin
+  namespace: kube-system
+  labels:
+    {{ .Values.kubernetes_component_label }}: cpu-device-plugin
+spec:
+  selector:
+    matchLabels:
+      {{ .Values.kubernetes_component_label }}: cpu-device-plugin
+  template:
+    metadata:
+      annotations:
+        danm.k8s.io/interfaces: |
+          [
+            {
+              "network":"flannel"
+            }
+          ]
+      labels:
+        {{ .Values.kubernetes_component_label }}: cpu-device-plugin
+    spec:
+      containers:
+      - name: cpu-device-plugin
+        image: {{ .Values.registry_url }}/{{ .Values.registry_reponame }}/cpupooler:{{ .Values.cpupooler.container_version }}
+        imagePullPolicy: IfNotPresent
+        command: [ "/cpu-device-plugin", "-logtostderr" ]
+        volumeMounts:
+         - mountPath: /etc/cpu-pooler
+           name: cpu-pooler-config
+         - mountPath: /var/lib/kubelet/device-plugins/
+           name: devicesock
+           readOnly: false
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      volumes:
+      - name: devicesock
+        hostPath:
+         # directory location on host
+         path: /var/lib/kubelet/device-plugins/
+      - name: cpu-pooler-config
+        configMap:
+          name: cpu-pooler-configmap
+      serviceAccountName: cpu-device-plugin
+{{ end }}

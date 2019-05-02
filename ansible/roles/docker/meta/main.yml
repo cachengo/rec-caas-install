@@ -1,0 +1,73 @@
+---
+# Copyright 2019 Nokia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+dependencies:
+  - role: creategroup
+    _name: kube
+    _gid: "{{ caas.uid.kube }}"
+    become: true
+    become_user: "root"
+
+  - role: createuser
+    _name: kube
+    _group: kube
+    _groups: ''
+    _shell: /sbin/nologin
+    _home: /
+    _uid: "{{ caas.uid.kube }}"
+    become: true
+    become_user: "root"
+
+  - role: cert
+    instance: "docker{{ nodeindex }}"
+    cert_path: /etc/docker
+    become: true
+    become_user: "root"
+
+  - role: cert
+    cert_name: "cert.pem"
+    key_name: "key.pem"
+    instance: "docker"
+    cert_path: /etc/docker
+    alt_names:
+      ip:
+        - "{{ ansible_host }}"
+    become: true
+    become_user: "root"
+
+  - role: cert
+    instance: "client{{ nodeindex }}"
+    cert_path: /etc/docker
+    add_users:
+      - kube
+    become: true
+    become_user: "root"
+
+  - role: creategroup
+    _name: docker
+    _gid: "{{ caas.uid.docker }}"
+    become: true
+    become_user: "root"
+
+  - role: createuser
+    _name: docker
+    _group: docker
+    _groups: ''
+    _shell: /sbin/nologin
+    _home: "{{ caas.docker_directory }}"
+    _uid: "{{ caas.uid.docker }}"
+    become: true
+    become_user: "root"
+

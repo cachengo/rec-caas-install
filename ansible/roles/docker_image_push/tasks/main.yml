@@ -1,0 +1,55 @@
+---
+# Copyright 2019 Nokia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- block:
+  - name: wait for registry endpoints
+    shell: "kubectl get endpoints registry --namespace=kube-system | grep -o ':{{ caas.registry_port }}' | wc -l"
+    register: result
+    until: result.stdout|int == groups.caas_master|length|int
+    retries: "{{ caas.container_wait_timeout }}"
+    delay: 1
+
+  - name: get registry containers ip and port
+    shell: "kubectl get endpoints registry --namespace=kube-system -o 'jsonpath={.subsets[*].addresses[*].ip}'"
+    register: registry_ep_ips
+
+  - name: wait for registry containers to start
+    wait_for:
+      host: "{{ item }}"
+      port: "{{ caas.registry_port }}"
+      state: started
+      timeout: "{{ caas.container_wait_timeout }}"
+    with_items: '{{ registry_ep_ips.stdout.split(" ") }}'
+  when: wait_for_registry | default(False)
+
+- name: get full image name
+  shell: "docker images --filter='reference={{ registry }}/{{ registry_repo }}/{{ item }}*' --format='{{ '{{.Repository}}:{{.Tag}}' }}'"
+  environment: "{{ docker_environment }}"
+  register: full_image_name
+  with_items: "{{ images }}"
+
+- name: save full image names
+  set_fact:
+    images_to_push: "{{ full_image_name.results | map(attribute='stdout') | list }}"
+
+# TODO: these should be changed to use docker image module. However, the name and the tag should be stored and replaced separately in Ansible dictionary to be able to do that
+- name: push images
+  shell: 'docker push "{{ item }}"'
+  environment: "{{ docker_environment }}"
+  with_items: "{{ images_to_push }}"
+  register: push_result
+  until: push_result.rc == 0
+  retries: 5
+  delay: 1

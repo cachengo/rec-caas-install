@@ -1,0 +1,52 @@
+---
+# Copyright 2019 Nokia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: template values.yaml in helm dir
+  template:
+    src: "{{ caas.caas_chart_path }}/values.yaml.j2"
+    dest: "{{ caas.caas_chart_path }}/values.yaml"
+
+- set_fact:
+    infra_chart_name: "caas-infra"
+
+- set_fact:
+    chart_file: "{{ lookup('file', '{{ caas.caas_chart_path}}/Chart.yaml') | from_yaml }}"
+
+- name: create chart tgz
+  shell: "tar -C {{ caas.caas_chart_path | dirname }} -cvzf {{ infra_chart_name }}-{{ chart_file.version }}.tgz {{ caas.caas_chart_path | basename }}"
+
+- name: upload individual charts to chart repo
+  shell: "curl -sS -XPOST -H 'Content-Type: application/gzip' --data-binary @{{ infra_chart_name }}-{{ chart_file.version }}.tgz {{ caas.chart_repo }}/charts/{{ infra_chart_name }}-{{ chart_file.version }}.tgz"
+
+- name: update helm repo
+  shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm repo update
+
+- name: helm-list
+  shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm get {{ infra_chart_name }}
+  register: crf_list_result
+  failed_when: "( crf_list_result.rc != 0 ) and ( not (crf_list_result.stderr | search('Error: release')) )"
+
+- block:
+  - name: Install infra_chart with helm
+    shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm install --wait --timeout {{ caas.helm_operation_timeout }} --name {{ infra_chart_name }} default/{{ infra_chart_name }}
+    when: "crf_list_result is defined and ( ( crf_list_result.stderr | search('Error: release:') ) or ( crf_list_result.stdout == '' ) )"
+
+  rescue:
+  - name: Delete the crf_infra_chart
+    shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm delete --purge {{ infra_chart_name }}
+
+  - name: fail the current playbook run, because helm install failed
+    fail:
+      msg: "ERROR: helm install {{ infra_chart_name }} failed"

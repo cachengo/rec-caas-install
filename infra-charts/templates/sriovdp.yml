@@ -1,0 +1,71 @@
+{{/*
+Copyright 2019 Nokia
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+{{ if .Values.sriovdp.required }}
+---
+apiVersion: apps/v1beta2
+kind: DaemonSet
+metadata:
+  name: sriovdp-ds
+  namespace: kube-system
+  labels:
+    app: sriovdp-app
+spec:
+  selector:
+    matchLabels:
+      name: sriovdp
+  template:
+    metadata:
+      annotations:
+        danm.k8s.io/interfaces: |
+          [
+            {
+              "network":"flannel"
+            }
+          ]
+      labels:
+        name: sriovdp
+    spec:
+      nodeSelector:
+        sriov: enabled
+      containers:
+      - name: sriovdp
+        image: {{ .Values.sriovdp.image_name }}
+        args:
+        - "-logtostderr"
+        - "-v=10"
+        - "-resource-prefix=nokia.k8s.io"
+        volumeMounts:
+        - mountPath: /var/lib/kubelet/device-plugins/
+          name: devicesock
+          readOnly: false
+        - mountPath: /sys/class/net/
+          name: sysfs
+          readOnly: true
+        - name: sriovdp-config
+          mountPath: /etc/pcidp/
+          readOnly: true
+      volumes:
+      - name: devicesock
+        hostPath:
+          path: /var/lib/kubelet/device-plugins/
+      - name: sysfs
+        hostPath:
+          path: /sys/class/net/
+      - name: sriovdp-config
+        hostPath:
+          path: /etc/pcidp/
+      terminationGracePeriodSeconds: 1
+{{ end }}

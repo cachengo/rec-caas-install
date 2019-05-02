@@ -1,0 +1,52 @@
+---
+# Copyright 2019 Nokia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Enable ntpd service
+  service:
+    name: ntpd
+    enabled: yes
+  become_user: "root"
+
+- name: removing docker image tar files
+  file:
+    state: absent
+    path: "{{ caas.infra_containers_directory }}"
+  become_user: "root"
+
+- name: remove ca.pem.enc
+  file:
+    state: absent
+    path: "/etc/openssl/ca.pem.enc"
+  no_log: True
+  become_user: "root"
+
+- name: remove ca-key.pem.enc
+  file:
+    state: absent
+    path: "/etc/openssl/ca-key.pem.enc"
+  no_log: True
+  become_user: "root"
+
+- name: adding acl for cloud_admin_user to read /var/log
+  acl:
+    entity: "{{ users.admin_user_name }}"
+    etype: user
+    path: "/var/log"
+    permissions: "rx"
+    recursive: yes
+    state: present
+  become_user: "root"
+  ignore_errors: yes
+  no_log: True

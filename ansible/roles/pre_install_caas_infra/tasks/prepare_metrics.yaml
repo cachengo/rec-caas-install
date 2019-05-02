@@ -1,0 +1,50 @@
+---
+# Copyright 2019 Nokia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: read metrics cert as base64 string
+  shell: "cat /etc/kubernetes/ssl/metrics.crt | base64 -w 0"
+  register: metrics_cert_content
+
+- name: read metrics cert key as base64 string
+  shell: "cat /etc/kubernetes/ssl/metrics.key | base64 -w 0"
+  register: metrics_cert_key_content
+
+- name: set b64 metrics cert variable
+  set_fact:
+    metrics_cert_b64: "{{ metrics_cert_content.stdout }}"
+    metrics_cert_key_b64: "{{ metrics_cert_key_content.stdout }}"
+
+- name: read prometheus cert as base64 string
+  shell: "cat /etc/kubernetes/ssl/prometheus.crt | base64 -w 0"
+  register: prometheus_cert_content
+  become_user: "root"
+
+- name: read prometheus cert key as base64 string
+  shell: "cat /etc/kubernetes/ssl/prometheus.key | base64 -w 0"
+  register: prometheus_cert_key_content
+  become_user: "root"
+
+- name: set b64 prometheus cert variable
+  set_fact:
+    prometheus_cert_b64: "{{ prometheus_cert_content.stdout }}"
+    prometheus_cert_key_b64: "{{ prometheus_cert_key_content.stdout }}"
+
+- name: remove prometheus key and cert
+  file: path='{{ item }}' state=absent
+  with_items:
+    - /etc/kubernetes/ssl/prometheus.key
+    - /etc/kubernetes/ssl/prometheus.crt
+  become_user: "root"
+

@@ -35,16 +35,16 @@
 
 - name: helm-list
   shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm get {{ infra_chart_name }}
-  register: crf_list_result
-  failed_when: "( crf_list_result.rc != 0 ) and ( not (crf_list_result.stderr | search('Error: release')) )"
+  register: caas_list_result
+  failed_when: "( caas_list_result.rc != 0 ) and ( not (caas_list_result.stderr | search('Error: release')) )"
 
 - block:
   - name: Install infra_chart with helm
     shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm install --wait --timeout {{ caas.helm_operation_timeout }} --name {{ infra_chart_name }} default/{{ infra_chart_name }}
-    when: "crf_list_result is defined and ( ( crf_list_result.stderr | search('Error: release:') ) or ( crf_list_result.stdout == '' ) )"
+    when: "caas_list_result is defined and ( ( caas_list_result.stderr | search('Error: release:') ) or ( caas_list_result.stdout == '' ) )"
 
   rescue:
-  - name: Delete the crf_infra_chart
+  - name: Delete the caas_infra_chart
     shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm delete --purge {{ infra_chart_name }}
 
   - name: fail the current playbook run, because helm install failed

@@ -55,7 +55,7 @@ spec:
         - name: NODE_MASTER
           value: "false"
         - name: DISCOVERY_SERVICE
-          value: elasticsearch-data.kube-system.svc.nokia.net
+          value: elasticsearch-data.kube-system.svc.{{ .Values.domain }}
         - name: PROCESSORS
           valueFrom:
             resourceFieldRef:

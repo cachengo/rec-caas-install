@@ -21,7 +21,7 @@ dependencies:
     cert_path: /etc/kubernetes/ssl
     alt_names:
       dns:
-        - "cpu-dev-pod-mutator-svc.kube-system.svc.nokia.net"
+        - "cpu-dev-pod-mutator-svc.kube-system.svc.{{ caas.dns_domain }}"
         - "cpu-dev-pod-mutator-svc.kube-system.svc"
     become: true
     become_user: "root"
@@ -46,7 +46,7 @@ dependencies:
     cert_path: /etc/metrics-server/ssl
     alt_names:
       dns:
-        - metrics-server.kube-system.svc.nokia.net
+        - "metrics-server.kube-system.svc.{{ caas.dns_domain }}"
         - metrics-server.kube-system.svc
     become: true
     become_user: "root"

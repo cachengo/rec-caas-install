@@ -153,3 +153,14 @@
   shell: "kubectl completion bash > /etc/bash_completion.d/kubectl-bash"
   become: true
   become_user: "root"
+
+- name: set envinment variables
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    line: "{{ item }}"
+    regexp: "{{ item }}"
+  become: true
+  become_user: "root"
+  with_items:
+    - "SWIFT_URL={{ caas.swift }}"

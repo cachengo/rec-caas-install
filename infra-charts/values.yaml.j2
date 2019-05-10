@@ -17,6 +17,7 @@ limitations under the License.
 kubernetes_component_label: {{ caas.kubernetes_component_label }}
 registry_url: {{ caas.registry_url }}:{{ caas.registry_port }}
 registry_reponame: "{{ caas.registry_repo }}"
+domain: "{{ caas.dns_domain }}"
 
 metrics_server:
   required: true

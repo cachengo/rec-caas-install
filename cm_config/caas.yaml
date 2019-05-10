@@ -23,33 +23,33 @@ caas_base_directory: "/var/lib/caas"
 infra_containers_directory: "{{ caas_base_directory }}/images"
 manifests_directory: "{{ caas_base_directory }}/manifests"
 registry_directory: /var/lib/registry
-apiserver_in_hosts: apiserver.nokia.net
+apiserver_in_hosts: apiserver.{{ dns_domain }}
 etcd_api_port: 4111
 etcd_peer_port: 4112
-kubernetes_component_label: ncrf-image
-swift_url: swift.kube-system.svc.nokia.net
+kubernetes_component_label: akrec-image
+swift_url: swift.kube-system.svc.{{ dns_domain }}
 swift_port: 8084
 swift: https://{{ swift_url }}:{{ swift_port }}
-swift_update_url: swift-update.kube-system.svc.nokia.net
+swift_update_url: swift-update.kube-system.svc.{{ dns_domain }}
 swift_memcached_port: 11222
 update_swift_port: 8091
 swift_update: https://{{ swift_update_url }}:{{ update_swift_port }}
 chart_repo_ip: 10.254.210.229
-chart_repo_url: chart-repo.kube-system.svc.nokia.net
+chart_repo_url: chart-repo.kube-system.svc.{{ dns_domain }}
 chart_repo_port: 8088
 chart_repo: https://{{ chart_repo_url }}:{{ chart_repo_port }}
 tiller_ip: 10.254.165.237
-tiller_url: tiller.kube-system.svc.nokia.net
+tiller_url: tiller.kube-system.svc.{{ dns_domain }}
 tiller_port: 44134
 tiller: https://{{ tiller_url }}:{{ tiller_port }}
-registry_url: registry.kube-system.svc.nokia.net
+registry_url: registry.kube-system.svc.{{ dns_domain }}
 registry_port: 5555
 registry: https://{{ registry_url }}:{{ registry_port }}
 registry_repo: "caas"
-update_registry_url: registry-update.kube-system.svc.nokia.net
+update_registry_url: registry-update.kube-system.svc.{{ dns_domain }}
 update_registry_port: 5556
 update_registry: https://{{ update_registry_url }}:{{ update_registry_port }}
-elasticsearch_url: elasticsearch-logging.kube-system.svc.nokia.net
+elasticsearch_url: elasticsearch-logging.kube-system.svc.{{ dns_domain }}
 elasticsearch_port: 9200
 elasticsearch_memory_request: 1Gi
 elasticsearch_memory_limit: 2Gi
@@ -59,8 +59,8 @@ elasticsearch_port_for_cluster_communication: 9300
 elasticsearch: https://{{ elasticsearch_url }}:{{ elasticsearch_port }}
 internal_flannel_interface: eth0
 container_wait_timeout: 120
-ldap_master_url: master.infraldap-server.nokia.net
-ldap_slave_url: infraldap-server-slave.kube-system.svc.nokia.net
+ldap_master_url: master.infraldap-server.{{ dns_domain }}
+ldap_slave_url: infraldap-server-slave.kube-system.svc.{{ dns_domain }}
 apiserver_secure_port: 6443
 apiserver_svc_port: 443
 default_partition_size: 16
@@ -72,7 +72,7 @@ caas_chart_path: "{{ caas_base_directory }}/infra-charts"
 caas_policy_directory: "{{ caas_base_directory }}/policies"
 kubernetes_service_url: kubernetes.default.svc
 prometheus_port: 9090
-prometheus_url: prometheus.kube-system.svc.nokia.net
+prometheus_url: prometheus.kube-system.svc.{{ dns_domain }}
 prometheus: https://{{ prometheus_url }}:{{ prometheus_port }}
 custom_metrics_api_port: 6443
 custom_metrics_api_serviceport: 443
@@ -85,7 +85,7 @@ kubernetes_secret_users: kube
 service_cluster_ip_cidr: "10.254.0.0/16"
 apiserver_svc_ip: "10.254.0.1"
 dns_svc_ip: "10.254.0.254"
-apiserver_service_name: "kubernetes.default.svc.nokia.net"
+apiserver_service_name: "kubernetes.default.svc.{{ dns_domain }}"
 rbac_manifests_directory: "{{ caas_base_directory }}/rbac_manifests"
 webhook_port: 443
 root_partition: "/dev/vda"

@@ -52,7 +52,7 @@ cpupooler:
   webhook_ca_bundle: {{ webhooks_ca }}
   webhook_port: {{ caas.webhook_port }}
   cpu_poolconfigs:
-    {{ ansible_local['ncir_cpu_pooler_config'] | default([]) | to_nice_yaml | indent(4) }}
+    {{ ansible_local['cpu_pooler_config'] | default([]) | to_nice_yaml | indent(4) }}
 
 elasticsearch:
   required: true

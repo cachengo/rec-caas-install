@@ -51,10 +51,16 @@ spec:
         - "--tls-cert-file=/etc/metrics-server/ssl/metrics-server.crt"
         - "--tls-private-key-file=/etc/metrics-server/ssl/metrics-server.key"
         volumeMounts:
+        - name: time-mount
+          mountPath: /etc/localtime
+          readOnly: true
         - name: stuffs
           mountPath: /etc/metrics-server
           readOnly: true
       volumes:
+      - name: time-mount
+        hostPath:
+          path: /etc/localtime
       - name: stuffs
         hostPath:
           path: /etc/metrics-server

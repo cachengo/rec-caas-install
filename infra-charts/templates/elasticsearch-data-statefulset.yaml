@@ -82,6 +82,9 @@ spec:
             port: {{ .Values.elasticsearch.port }}
           initialDelaySeconds: 5
         volumeMounts:
+        - name: time-mount
+          mountPath: /etc/localtime
+          readOnly: true
         - mountPath: /usr/share/elasticsearch/data
           name: data
         - mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
@@ -95,6 +98,9 @@ spec:
           subPath: elasticsearch-logrotate
       terminationGracePeriodSeconds: {{ .Values.elasticsearch.data.terminationGracePeriodSeconds }}
       volumes:
+        - name: time-mount
+          hostPath:
+            path: /etc/localtime
         - name: elasticsearch-config
           configMap:
             name: elasticsearch

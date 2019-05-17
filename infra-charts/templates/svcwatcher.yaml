@@ -44,6 +44,10 @@ spec:
           image: {{ .Values.registry_url }}/{{ .Values.registry_reponame }}/svcwatcher:{{ .Values.svcwatcher.container_version }}
           args:
             - "--logtostderr"
+          volumeMounts:
+            - name: time-mount
+              mountPath: /etc/localtime
+              readOnly: true
       tolerations:
        - effect: NoSchedule
          operator: Exists
@@ -51,4 +55,8 @@ spec:
          operator: Exists
       terminationGracePeriodSeconds: 0
       serviceAccountName: svcwatcher
+      volumes:
+        - name: time-mount
+          hostPath:
+            path: /etc/localtime
 {{ end }}

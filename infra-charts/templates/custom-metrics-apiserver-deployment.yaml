@@ -60,6 +60,9 @@ spec:
         ports:
         - containerPort: {{ .Values.custom_metrics_api.port }}
         volumeMounts:
+          - name: time-mount
+            mountPath: /etc/localtime
+            readOnly: true
           - mountPath: /var/run/serving-cert
             name: volume-serving-cert
             readOnly: true
@@ -76,6 +79,9 @@ spec:
             name: config
             readOnly: true
       volumes:
+        - name: time-mount
+          hostPath:
+            path: /etc/localtime
         - name: volume-serving-cert
           secret:
             secretName: cm-adapter-serving-certs

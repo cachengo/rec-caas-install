@@ -44,6 +44,9 @@ spec:
         imagePullPolicy: IfNotPresent
         command: [ "/cpu-device-plugin", "-logtostderr" ]
         volumeMounts:
+         - name: time-mount
+           mountPath: /etc/localtime
+           readOnly: true
          - mountPath: /etc/cpu-pooler
            name: cpu-pooler-config
          - mountPath: /var/lib/kubelet/device-plugins/
@@ -55,6 +58,9 @@ spec:
             fieldRef:
               fieldPath: spec.nodeName
       volumes:
+      - name: time-mount
+        hostPath:
+          path: /etc/localtime
       - name: devicesock
         hostPath:
          # directory location on host

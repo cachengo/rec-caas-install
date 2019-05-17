@@ -44,6 +44,9 @@ spec:
         imagePullPolicy: IfNotPresent
         command: [ "/cpu-setter", "--poolconfigs=/etc/cpu-pooler", "--cpusetroot=/sys/fs/cgroup/cpuset/kubepods/" ]
         volumeMounts:
+         - name: time-mount
+           mountPath: /etc/localtime
+           readOnly: true
          - mountPath: /etc/cpu-pooler
            name: cpu-pooler-config
          - mountPath: /var/lib/kubelet/device-plugins/kubelet_internal_checkpoint
@@ -55,6 +58,9 @@ spec:
             fieldRef:
               fieldPath: spec.nodeName
       volumes:
+      - name: time-mount
+        hostPath:
+          path: /etc/localtime
       - name: checkpointfile
         hostPath:
          path: /var/lib/kubelet/device-plugins/kubelet_internal_checkpoint

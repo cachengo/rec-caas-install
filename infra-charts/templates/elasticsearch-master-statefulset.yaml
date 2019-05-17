@@ -80,6 +80,9 @@ spec:
         - containerPort: {{ .Values.elasticsearch.port }}
           name: http
         volumeMounts:
+        - name: time-mount
+          mountPath: /etc/localtime
+          readOnly: true
         - mountPath: /usr/share/elasticsearch/data
           name: data
         - mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
@@ -89,6 +92,9 @@ spec:
           name: supervisord-config
           subPath: supervisord.conf
       volumes:
+        - name: time-mount
+          hostPath:
+            path: /etc/localtime
         - name: elasticsearch-config
           configMap:
             name: elasticsearch

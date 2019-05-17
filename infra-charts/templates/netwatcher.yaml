@@ -40,6 +40,10 @@ spec:
                 - SYS_ADMIN
                 - NET_ADMIN
                 - NET_RAW
+          volumeMounts:
+            - name: time-mount
+              mountPath: /etc/localtime
+              readOnly: true
       tolerations:
        - effect: NoSchedule
          operator: Exists
@@ -47,3 +51,7 @@ spec:
          operator: Exists
       terminationGracePeriodSeconds: 0
       serviceAccountName: netwatcher
+      volumes:
+        - name: time-mount
+          hostPath:
+            path: /etc/localtime

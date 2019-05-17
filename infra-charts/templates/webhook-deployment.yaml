@@ -47,12 +47,18 @@ spec:
           command: [ "/cpu-device-webhook", "-tls-cert-file=/etc/webhook/certs/cpuwebhook.crt", "-tls-private-key-file=/etc/webhook/certs/cpuwebhook.key", "-alsologtostderr", "-v=4" ]
           imagePullPolicy: IfNotPresent
           volumeMounts:
+            - name: time-mount
+              mountPath: /etc/localtime
+              readOnly: true
             - name: webhook-certs
               mountPath: /etc/webhook/certs
               readOnly: true
             - name: cpu-pooler-config
               mountPath: /etc/cpu-pooler
       volumes:
+        - name: time-mount
+          hostPath:
+            path: /etc/localtime
         # TODO: make it a secret
         - name: webhook-certs
           hostPath:

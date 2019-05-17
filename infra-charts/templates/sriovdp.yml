@@ -48,6 +48,9 @@ spec:
         - "-v=10"
         - "-resource-prefix=nokia.k8s.io"
         volumeMounts:
+        - name: time-mount
+          mountPath: /etc/localtime
+          readOnly: true
         - mountPath: /var/lib/kubelet/device-plugins/
           name: devicesock
           readOnly: false
@@ -58,6 +61,9 @@ spec:
           mountPath: /etc/pcidp/
           readOnly: true
       volumes:
+      - name: time-mount
+        hostPath:
+          path: /etc/localtime
       - name: devicesock
         hostPath:
           path: /var/lib/kubelet/device-plugins/

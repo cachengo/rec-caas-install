@@ -56,6 +56,9 @@ spec:
           limits:
             memory: 2Gi
         volumeMounts:
+        - name: time-mount
+          mountPath: /etc/localtime
+          readOnly: true
         - mountPath: /var/run/serving-cert
           name: prometheus-serving-cert
           readOnly: true
@@ -72,6 +75,9 @@ spec:
           initialDelaySeconds: 3
           timeoutSeconds: 5
       volumes:
+        - name: time-mount
+          hostPath:
+            path: /etc/localtime
         - name: prometheus-serving-cert
           secret:
             secretName: prometheus-serving-certs

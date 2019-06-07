@@ -1,0 +1,30 @@
+{{ if .Values.cpupooler.required }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: webhook-cfg-updater
+  namespace: kube-system
+  labels:
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      annotations:
+        danm.k8s.io/interfaces: |
+          [
+            {
+              "network":"flannel"
+            }
+          ]
+    spec:
+      containers:
+      - name: webhook-cfg-updater
+        image: {{ .Values.registry_url }}/{{ .Values.registry_reponame }}/cpupooler:{{ .Values.cpupooler.container_version }}
+        command: ["sh", "-c", "--"]
+        args: ["RESVER=$(curl -k -H \"Authorization: Bearer $(cat {{ .Values.cpupooler.secret_path }}/token)\" -H 'Accept: application/json' --cacert {{ .Values.cpupooler.secret_path }}/ca.cert https://{{ .Values.apiserver_service_name }}/apis/admissionregistration.k8s.io/v1beta1/mutatingwebhookconfigurations/{{ .Values.cpupooler.webhook_conf_name }} | grep resourceVersion | awk '{print $2}' | tr -d ',' | tr -d '\"'); curl -k -X PUT -H \"Authorization: Bearer $(cat {{ .Values.cpupooler.secret_path }}/token)\" -H 'Accept: application/json' -H 'Content-Type: application/json' --cacert {{ .Values.cpupooler.secret_path }}/ca.cert https://{{ .Values.apiserver_service_name }}/apis/admissionregistration.k8s.io/v1beta1/mutatingwebhookconfigurations/{{ .Values.cpupooler.webhook_conf_name }} -d '{ \"apiVersion\": \"admissionregistration.k8s.io/v1beta1\", \"kind\": \"MutatingWebhookConfiguration\", \"metadata\": { \"name\": \"{{ .Values.cpupooler.webhook_conf_name }}\", \"namespace\": \"kube-system\", \"resourceVersion\": \"'$RESVER'\" }, \"webhooks\": [{\"name\": \"cpu-dev-mutator.nokia.k8s.io\", \"clientConfig\": {\"service\": {\"name\": \"{{ .Values.cpupooler.webhook_svc_name }}\", \"namespace\":\"kube-system\", \"path\":\"/mutating-pods\"}, \"caBundle\": \"{{ .Values.cpupooler.webhook_ca_bundle }}\" }, \"rules\": [{\"operations\": [\"CREATE\", \"UPDATE\"], \"apiGroups\": [\"\"], \"apiVersions\": [\"v1\"], \"resources\": [\"pods\"] }], \"failurePolicy\": \"Fail\" }]}';"]
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Never
+      serviceAccountName: webhookcfg-controller
+{{ end }}

@@ -101,3 +101,10 @@ uid:
   chartrepo: 150
   elasticsearch: 202
   flannel: 666
+cpu_allocation_mapping:
+  caas_exclusive:
+    pool_name: exclusive_caas
+  caas_shared:
+    pool_name: shared_caas
+  caas_default:
+    pool_name: default

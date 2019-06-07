@@ -20,6 +20,7 @@ class FilterModule(object):
     def filters(self):
         return {
             'get_kube_options': get_kube_options,
+            'get_mapped_key': get_mapped_key,
         }
 
 
@@ -31,3 +32,16 @@ def get_kube_options(options):
     formated_options = [option_template.format(option, str(value))
                         for option, value in options.iteritems()]
     return ",".join(formated_options)
+
+
+def get_mapped_key(mapping, search_key, key_name):
+    _validate_dict(mapping)
+    for key, value in mapping.iteritems():
+        if (value.get(search_key, None) and
+           value[search_key] == key_name):
+            return key
+
+
+def _validate_dict(value):
+    if not isinstance(value, dict):
+        raise AnsibleError("Invalid type {}. Options must be dictionary!".format(type(options)))

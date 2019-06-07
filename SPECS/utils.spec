@@ -15,7 +15,7 @@
 %define COMPONENT utils
 %define RPM_NAME caas-%{COMPONENT}
 %define RPM_MAJOR_VERSION 1.0.0
-%define RPM_MINOR_VERSION 3
+%define RPM_MINOR_VERSION 4
 %define KUBELET_PLUGINS_LOGDIR /var/log/kubelet-plugins/
 
 Name:           %{RPM_NAME}

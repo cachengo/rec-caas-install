@@ -18,7 +18,7 @@ limitations under the License.
 apiVersion: v1
 kind: Service
 metadata:
-  name: cpu-dev-pod-mutator-svc
+  name: {{ .Values.cpupooler.webhook_svc_name }}
   namespace: kube-system
   labels:
     {{ .Values.kubernetes_component_label }}: cpu-dev-pod-mutator

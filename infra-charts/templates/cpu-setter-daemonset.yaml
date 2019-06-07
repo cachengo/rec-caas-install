@@ -51,7 +51,7 @@ spec:
            name: cpu-pooler-config
          - mountPath: /var/lib/kubelet/device-plugins/kubelet_internal_checkpoint
            name: checkpointfile
-           readOnly: false
+           readOnly: true
         env:
         - name: NODE_NAME
           valueFrom:

@@ -18,6 +18,7 @@ kubernetes_component_label: {{ caas.kubernetes_component_label }}
 registry_url: {{ caas.registry_url }}:{{ caas.registry_port }}
 registry_reponame: "{{ caas.registry_repo }}"
 domain: "{{ caas.dns_domain }}"
+apiserver_service_name: {{ caas.apiserver_service_name }}
 
 metrics_server:
   required: true
@@ -49,6 +50,9 @@ netwatcher:
 
 cpupooler:
   required: true
+  webhook_conf_name: cpu-device-pod-mutator-webhook-config
+  webhook_svc_name: cpu-dev-pod-mutator-svc
+  secret_path: /var/run/secrets/kubernetes.io/serviceaccount
   container_version: {{ container_image_names | select('search', '/cpupooler') | list | last | regex_replace('.*:([\\w\\-_\\.]+)$', '\\1') }}
   webhook_ca_bundle: {{ webhooks_ca }}
   webhook_port: {{ caas.webhook_port }}

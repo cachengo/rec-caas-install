@@ -15,7 +15,7 @@
 %define COMPONENT instantiate
 %define RPM_NAME caas-%{COMPONENT}
 %define RPM_MAJOR_VERSION 1.0.0
-%define RPM_MINOR_VERSION 2
+%define RPM_MINOR_VERSION 3
 
 Name:           %{RPM_NAME}
 Version:        %{RPM_MAJOR_VERSION}
@@ -36,7 +36,6 @@ This rpm contains the necessary playbooks to instantiate the caas subsystem.
 
 %install
 mkdir -p %{buildroot}/%{_playbooks_path}/
-rsync -av ansible/playbooks/app_install.yaml %{buildroot}/%{_playbooks_path}/
 rsync -av ansible/playbooks/caas_cleanup.yaml %{buildroot}/%{_playbooks_path}/
 rsync -av ansible/playbooks/cloud_admin_user.yaml %{buildroot}/%{_playbooks_path}/
 rsync -av ansible/playbooks/common.yaml %{buildroot}/%{_playbooks_path}/
@@ -46,7 +45,6 @@ rsync -av ansible/playbooks/openrc_hack.yaml %{buildroot}/%{_playbooks_path}/
 rsync -av ansible/playbooks/pre_config_all.yaml %{buildroot}/%{_playbooks_path}/
 
 mkdir -p %{buildroot}/%{_roles_path}/
-rsync -av ansible/roles/app_install %{buildroot}/%{_roles_path}/
 rsync -av ansible/roles/caas_cleanup %{buildroot}/%{_roles_path}/
 rsync -av ansible/roles/cloud_admin_user %{buildroot}/%{_roles_path}/
 rsync -av ansible/roles/common_tasks %{buildroot}/%{_roles_path}/
@@ -94,7 +92,6 @@ sed -ri '/^libexec_dir/{s|:.*|: %{_caas_libexec_path}|}'                       %
 
 %post
 mkdir -p %{_postconfig_path}/
-ln -sf %{_playbooks_path}/app_install.yaml      %{_postconfig_path}/
 ln -sf %{_playbooks_path}/cloud_admin_user.yaml %{_postconfig_path}/
 ln -sf %{_playbooks_path}/common.yaml           %{_postconfig_path}/
 ln -sf %{_playbooks_path}/docker.yaml           %{_postconfig_path}/
@@ -107,7 +104,6 @@ ln -sf %{_playbooks_path}/caas_cleanup.yaml     %{_finalize_path}/
 
 %postun
 if [ $1 -eq 0 ]; then
-    rm -f %{_postconfig_path}/app_install.yaml
     rm -f %{_postconfig_path}/cloud_admin_user.yaml
     rm -f %{_postconfig_path}/common.yaml
     rm -f %{_postconfig_path}/docker.yaml

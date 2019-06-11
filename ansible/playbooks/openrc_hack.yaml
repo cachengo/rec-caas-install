@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# cmframework.requires: app_install.yaml
+# cmframework.requires: fluentd.yaml
 - name: Create mandatory openrc file for finalize plays
   hosts: installation_controller:&caas_master
   strategy: free

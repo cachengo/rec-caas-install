@@ -33,18 +33,24 @@
 - name: update helm repo
   shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm repo update
 
-- name: helm-list
+- name: check helm chart availability
   shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm get {{ infra_chart_name }}
   register: caas_list_result
   failed_when: "( caas_list_result.rc != 0 ) and ( not (caas_list_result.stderr | search('Error: release')) )"
 
 - block:
-  - name: Install infra_chart with helm
-    shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm install --wait --timeout {{ caas.helm_operation_timeout }} --name {{ infra_chart_name }} default/{{ infra_chart_name }}
-    when: "caas_list_result is defined and ( ( caas_list_result.stderr | search('Error: release:') ) or ( caas_list_result.stdout == '' ) )"
+  - name: install {{ infra_chart_name }} with helm
+    shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm install --name {{ infra_chart_name }} default/{{ infra_chart_name }}
+
+  - name: poll infra pod status
+    shell: kubectl get pods --no-headers --namespace=kube-system | grep -vEw "1/1|2/2|3/3" | grep -vE "sriovdp|webhook-cfg-cleaner" | wc -l
+    register: poll
+    until: poll.stdout == "0"
+    retries: "{{ ((caas.helm_operation_timeout | int) / 5) | int }}"
+    delay: 5
 
   rescue:
-  - name: Delete the caas_infra_chart
+  - name: delete the {{ infra_chart_name }} chart
     shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm delete --purge {{ infra_chart_name }}
 
   - name: fail the current playbook run, because helm install failed

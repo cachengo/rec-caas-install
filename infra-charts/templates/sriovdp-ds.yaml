@@ -15,7 +15,7 @@ limitations under the License.
 */}}
 {{ if .Values.sriovdp.required }}
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: sriovdp-ds
@@ -60,6 +60,17 @@ spec:
         - name: sriovdp-config
           mountPath: /etc/pcidp/
           readOnly: true
+      initContainers:
+      - name: init-sriov
+        image: {{ .Values.sriovdp.image_name }}
+        command: ['sh', '-c', 'source /init/init.sh']
+        volumeMounts:
+        - name: sriovdp-config
+          mountPath: /etc/pcidp/
+          readOnly: true
+        - name: sriovdp-init
+          mountPath: /init/
+          readOnly: true
       volumes:
       - name: time-mount
         hostPath:
@@ -73,5 +84,8 @@ spec:
       - name: sriovdp-config
         hostPath:
           path: /etc/pcidp/
+      - name: sriovdp-init
+        configMap:
+          name: sriovdp-initcm
       terminationGracePeriodSeconds: 1
 {{ end }}

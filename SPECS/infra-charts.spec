@@ -15,7 +15,7 @@
 %define COMPONENT infra-charts
 %define RPM_NAME caas-%{COMPONENT}
 %define RPM_MAJOR_VERSION 1.0.0
-%define RPM_MINOR_VERSION 4
+%define RPM_MINOR_VERSION 5
 
 Name:           %{RPM_NAME}
 Version:        %{RPM_MAJOR_VERSION}
@@ -25,6 +25,8 @@ License:        %{_platform_license}
 BuildArch:      x86_64
 Vendor:         %{_platform_vendor}
 Source0:        %{name}-%{version}.tar.gz
+
+Requires: rsync
 
 %description
 This rpm contains the necessary helm charts to deploy the caas subsystem.

@@ -52,25 +52,33 @@ spec:
       containers:
       - name: elasticsearch-data
         env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: CLUSTER_INITIAL_MASTER_NODES
+          value: '{{ .Values.elasticsearch.clustermasternodes }}'
         - name: NODE_MASTER
           value: "false"
+        - name: NODE_INGEST
+          value: "true"
+        - name: NODE_DATA
+          value: "true"
         - name: DISCOVERY_SERVICE
-          value: elasticsearch-data.kube-system.svc.{{ .Values.domain }}
+          value: {{ .Values.elasticsearch.url }}
         - name: PROCESSORS
           valueFrom:
             resourceFieldRef:
               resource: limits.cpu
         - name: ES_JAVA_OPTS
           value: "-Xms{{ .Values.elasticsearch.java_heap_request }} -Xmx{{ .Values.elasticsearch.java_heap_max }} -Dmapper.allow_dots_in_name=true"
-        {{- range $key, $value :=  .Values.elasticsearch.cluster.env }}
+        {{- range $key, $value :=  .Values.elasticsearch.env }}
         - name: {{ $key }}
           value: {{ $value | quote }}
         {{- end }}
         image: {{ .Values.elasticsearch.image_name }}
         command: ["/usr/bin/supervisord","-n","-c","/etc/supervisord.conf"]
-        ports:
-        - containerPort: {{ .Values.elasticsearch.port_for_cluster_communication }}
-          name: transport
         resources:
           limits:
             cpu: "{{ .Values.elasticsearch.cpu_limit }}"

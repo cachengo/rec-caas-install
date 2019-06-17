@@ -25,8 +25,12 @@ metadata:
   namespace: kube-system
 spec:
   ports:
+    - port: {{ .Values.elasticsearch.port }}
+      name: http
+      protocol: TCP
     - port: {{ .Values.elasticsearch.port_for_cluster_communication }}
-      targetPort: transport
+      name: node-to-node
+      protocol: TCP
   selector:
     app: elasticsearch-data
     component: "{{ .Values.elasticsearch.data.name }}"
@@ -42,7 +46,11 @@ metadata:
 spec:
   ports:
     - port: {{ .Values.elasticsearch.port }}
-      targetPort: http
+      name: http
+      protocol: TCP
+    - port: {{ .Values.elasticsearch.port_for_cluster_communication }}
+      name: node-to-node
+      protocol: TCP
   selector:
     app: elasticsearch-master
     component: "{{ .Values.elasticsearch.master.name }}"

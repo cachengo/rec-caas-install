@@ -25,23 +25,17 @@ metadata:
 data:
   elasticsearch.yml: |-
     cluster.name: {{ .Values.elasticsearch.cluster.name }}
-
     node.data: ${NODE_DATA:true}
     node.master: ${NODE_MASTER:true}
     node.ingest: ${NODE_INGEST:true}
-    node.name: ${HOSTNAME}
-
+    cluster.initial_master_nodes: ${CLUSTER_INITIAL_MASTER_NODES}
     network.host: 0.0.0.0
     bootstrap.memory_lock: ${BOOTSTRAP_MEMORY_LOCK:false}
-
     discovery:
       zen:
-        ping.unicast.hosts: ${DISCOVERY_SERVICE:}
-        minimum_master_nodes: ${MINIMUM_MASTER_NODES:2}
-
+        minimum_master_nodes: ${MINIMUM_MASTER_NODES}
+      seed_hosts: ${DISCOVERY_SERVICE}
     processors: ${PROCESSORS:}
-
-    # avoid split-brain w/ a minimum consensus of 3 masters plus 3 data nodes
     gateway.expected_master_nodes: ${EXPECTED_MASTER_NODES:3}
     gateway.expected_data_nodes: ${EXPECTED_DATA_NODES:3}
     gateway.recover_after_time: ${RECOVER_AFTER_TIME:5m}

@@ -60,7 +60,13 @@ cpupooler:
     {{ ansible_local['cpu_pooler_config'] | default([]) | to_nice_yaml | indent(4) }}
 
 elasticsearch:
+{% set clustermasternodes = [] -%}
+{%- for masternumber in range(groups['caas_master']|length|int) -%}
+{%- if clustermasternodes.append('elasticsearch-master-' + (masternumber|string)) -%}{%- endif -%}
+{%- endfor %}
+  clustermasternodes: '{{ clustermasternodes|join(", ") }}'
   required: true
+  url: {{ caas.elasticsearch_url }}
   port: {{ caas.elasticsearch_port }}
   image_name: {{ container_image_names | select('search', '/elasticsearch') | list | last }}
   memory_limit: {{ caas.elasticsearch_memory_limit }}
@@ -73,13 +79,14 @@ elasticsearch:
   cluster:
     name: "elasticsearch"
   env:
-    MINIMUM_MASTER_NODES: "3"
+{% set minimummasternodes = ((((groups['caas_master']|length|int)/2)+1)|round(0, 'floor'))|int %}
+    MINIMUM_MASTER_NODES: {{ minimummasternodes }}
   master:
     name: elasticsearch-master
-    replicas: 3
+    replicas: "{{ groups['caas_master']|length|int }}"
   data:
     name: elasticsearch-data
-    replicas: 3
+    replicas: "{{ groups['caas_master']|length|int }}"
     terminationGracePeriodSeconds: 3600
 
 sriovdp:

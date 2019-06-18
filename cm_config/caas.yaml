@@ -52,6 +52,8 @@ update_registry_port: 5556
 update_registry: https://{{ update_registry_url }}:{{ update_registry_port }}
 elasticsearch_url: elasticsearch-logging.kube-system.svc.{{ dns_domain }}
 elasticsearch_port: 9200
+elasticsearch_scheme: http
+elasticsearch_logstash_prefix: caas
 elasticsearch_memory_request: 1Gi
 elasticsearch_memory_limit: 2Gi
 elasticsearch_java_heap_request: 800m
@@ -101,6 +103,8 @@ uid:
   chartrepo: 150
   elasticsearch: 202
   flannel: 666
+infra_namespaces:
+  - kube-system
 cpu_allocation_mapping:
   caas_exclusive:
     pool_name: exclusive_caas

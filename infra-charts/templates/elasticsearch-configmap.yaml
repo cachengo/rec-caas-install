@@ -137,7 +137,7 @@ data:
     do
         pcent=`df --output=pcent /usr/share/elasticsearch/data | tail -n1 | tr -d '%'`
         if [ $pcent -le $FS_LIMIT ]; then exit; fi
-        oldest=`curl -s -XGET 'localhost:9200/_cat/indices' | cut -d' ' -f3 | grep ^logstash | sort | head -n1`
-        curl -XDELETE "localhost:9200/$oldest" >/dev/null
+        oldest=`curl -s -XGET 'localhost:{{ .Values.elasticsearch.port }}/_cat/indices' | cut -d' ' -f3 | grep ^{{ .Values.elasticsearch.logstash_prefix }} | sort | head -n1`
+        curl -XDELETE "localhost:{{ .Values.elasticsearch.port }}/$oldest" >/dev/null
     done
 {{ end }}

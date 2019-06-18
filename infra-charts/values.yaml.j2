@@ -65,9 +65,12 @@ elasticsearch:
 {%- if clustermasternodes.append('elasticsearch-master-' + (masternumber|string)) -%}{%- endif -%}
 {%- endfor %}
   clustermasternodes: '{{ clustermasternodes|join(", ") }}'
+{% if caas.infra_log_store is defined and caas.infra_log_store != 'remote_syslog' %}  
   required: true
-  url: {{ caas.elasticsearch_url }}
+{% endif %}
   port: {{ caas.elasticsearch_port }}
+  scheme: {{ caas.elasticsearch_scheme }}
+  logstash_prefix: {{ caas.elasticsearch_logstash_prefix }}
   image_name: {{ container_image_names | select('search', '/elasticsearch') | list | last }}
   memory_limit: {{ caas.elasticsearch_memory_limit }}
   cpu_limit: 1

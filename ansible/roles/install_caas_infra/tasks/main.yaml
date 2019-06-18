@@ -18,6 +18,16 @@
     src: "{{ caas.caas_chart_path }}/values.yaml.j2"
     dest: "{{ caas.caas_chart_path }}/values.yaml"
 
+- name: template component specific values file in helm dir
+  template:
+    src: "{{ caas.caas_chart_path }}/values_{{ item }}.yaml.j2"
+    dest: "{{ caas.caas_chart_path }}/values_{{ item }}.yaml"
+  with_items: "{{ infra_chart_separated_values }}"
+
+- name: append component specific values content to common values file
+  shell: "cat {{ caas.caas_chart_path }}/values_{{ item }}.yaml >> {{ caas.caas_chart_path }}/values.yaml"
+  with_items: "{{ infra_chart_separated_values }}"
+
 - set_fact:
     infra_chart_name: "caas-infra"
 

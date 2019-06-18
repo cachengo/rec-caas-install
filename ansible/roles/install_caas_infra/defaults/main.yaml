@@ -22,3 +22,6 @@ infra_chart_images:
   - sriovdp
   - svcwatcher
   - netwatcher
+  - fluentd
+infra_chart_separated_values:
+  - fluentd

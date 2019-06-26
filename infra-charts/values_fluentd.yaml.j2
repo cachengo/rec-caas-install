@@ -39,4 +39,4 @@ fluentd:
 {% endif %}
 {%- endfor %}
 {% endif %}
-  config_timestamp: {{ ansible_date_time.epoch }}
+  config_timestamp: {{ lookup('pipe', 'date +%s') }}

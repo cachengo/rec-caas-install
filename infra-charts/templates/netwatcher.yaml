@@ -28,6 +28,7 @@ spec:
       labels:
         {{ .Values.kubernetes_component_label }}: netwatcher
     spec:
+      priorityClassName: "system-node-critical"
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
@@ -40,6 +41,9 @@ spec:
                 - SYS_ADMIN
                 - NET_ADMIN
                 - NET_RAW
+          resources:
+            requests:
+              cpu: "10m"
           volumeMounts:
             - name: time-mount
               mountPath: /etc/localtime

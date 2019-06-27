@@ -38,6 +38,7 @@ spec:
       labels:
         name: sriovdp
     spec:
+      priorityClassName: "system-node-critical"
       nodeSelector:
         sriov: enabled
       containers:
@@ -47,6 +48,9 @@ spec:
         - "-logtostderr"
         - "-v=10"
         - "-resource-prefix=nokia.k8s.io"
+        resources:
+          requests:
+            cpu: "10m"
         volumeMounts:
         - name: time-mount
           mountPath: /etc/localtime

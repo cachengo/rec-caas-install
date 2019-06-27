@@ -36,6 +36,7 @@ spec:
       labels:
         {{ .Values.kubernetes_component_label }}: svcwatcher
     spec:
+      priorityClassName: "system-cluster-critical"
       dnsPolicy: ClusterFirst
       nodeSelector:
         nodetype: caas_master
@@ -44,6 +45,9 @@ spec:
           image: {{ .Values.registry_url }}/{{ .Values.registry_reponame }}/svcwatcher:{{ .Values.svcwatcher.container_version }}
           args:
             - "--logtostderr"
+          resources:
+            requests:
+              cpu: "10m"
           volumeMounts:
             - name: time-mount
               mountPath: /etc/localtime

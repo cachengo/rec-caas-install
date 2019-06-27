@@ -39,6 +39,7 @@ spec:
             }
           ]
     spec:
+      priorityClassName: "system-cluster-critical"
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -76,6 +77,7 @@ spec:
           limits:
             memory: "{{ .Values.elasticsearch.memory_limit }}"
           requests:
+            cpu: "100m"
             memory: "{{ .Values.elasticsearch.memory_request }}"
         readinessProbe:
           httpGet:

@@ -40,6 +40,7 @@ spec:
             }
           ]
     spec:
+      priorityClassName: "system-cluster-critical"
       nodeSelector:
         nodetype: caas_master
       serviceAccountName: custom-metrics-apiserver
@@ -59,6 +60,9 @@ spec:
         - --config=/etc/adapter/config.yaml
         ports:
         - containerPort: {{ .Values.custom_metrics_api.port }}
+        resources:
+          requests:
+            cpu: "10m"
         volumeMounts:
           - name: time-mount
             mountPath: /etc/localtime

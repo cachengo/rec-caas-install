@@ -39,6 +39,7 @@ spec:
       labels:
         {{ .Values.kubernetes_component_label }}: metrics-server
     spec:
+      priorityClassName: "system-cluster-critical"
       nodeSelector:
         nodetype: caas_master
       serviceAccountName: metrics-apiserver
@@ -50,6 +51,9 @@ spec:
         - "--logtostderr"
         - "--tls-cert-file=/etc/metrics-server/ssl/metrics-server.crt"
         - "--tls-private-key-file=/etc/metrics-server/ssl/metrics-server.key"
+        resources:
+          requests:
+            cpu: "10m"
         volumeMounts:
         - name: time-mount
           mountPath: /etc/localtime

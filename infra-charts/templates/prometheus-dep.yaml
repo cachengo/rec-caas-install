@@ -38,6 +38,7 @@ spec:
             }
           ]
     spec:
+      priorityClassName: "system-cluster-critical"
       nodeSelector:
         nodetype: caas_master
       serviceAccountName: prometheus
@@ -55,6 +56,8 @@ spec:
         resources:
           limits:
             memory: 2Gi
+          requests:
+            cpu: "30m"
         volumeMounts:
         - name: time-mount
           mountPath: /etc/localtime

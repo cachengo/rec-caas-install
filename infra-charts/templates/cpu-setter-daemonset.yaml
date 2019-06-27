@@ -38,11 +38,15 @@ spec:
       labels:
         {{ .Values.kubernetes_component_label }}: cpu-setter
     spec:
+      priorityClassName: "system-node-critical"
       containers:
       - name: cpu-device-plugin
         image: {{ .Values.registry_url }}/{{ .Values.registry_reponame }}/cpupooler:{{ .Values.cpupooler.container_version }}
         imagePullPolicy: IfNotPresent
         command: [ "/cpu-setter", "--poolconfigs=/etc/cpu-pooler", "--cpusetroot=/sys/fs/cgroup/cpuset/kubepods/" ]
+        resources:
+          requests:
+            cpu: "10m"
         volumeMounts:
          - name: time-mount
            mountPath: /etc/localtime

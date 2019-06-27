@@ -39,6 +39,7 @@ spec:
       labels:
         {{ .Values.kubernetes_component_label }}: cpu-dev-pod-mutator
     spec:
+      priorityClassName: "system-cluster-critical"
       nodeSelector:
         nodetype: caas_master
       containers:
@@ -46,6 +47,9 @@ spec:
           image: {{ .Values.registry_url }}/{{ .Values.registry_reponame }}/cpupooler:{{ .Values.cpupooler.container_version }}
           command: [ "/cpu-device-webhook", "-tls-cert-file=/etc/webhook/certs/cpuwebhook.crt", "-tls-private-key-file=/etc/webhook/certs/cpuwebhook.key", "-alsologtostderr", "-v=4" ]
           imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: "10m"
           volumeMounts:
             - name: time-mount
               mountPath: /etc/localtime

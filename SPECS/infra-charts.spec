@@ -15,7 +15,7 @@
 %define COMPONENT infra-charts
 %define RPM_NAME caas-%{COMPONENT}
 %define RPM_MAJOR_VERSION 1.0.0
-%define RPM_MINOR_VERSION 13
+%define RPM_MINOR_VERSION 14
 
 Name:           %{RPM_NAME}
 Version:        %{RPM_MAJOR_VERSION}
@@ -26,7 +26,7 @@ BuildArch:      x86_64
 Vendor:         %{_platform_vendor}
 Source0:        %{name}-%{version}.tar.gz
 
-Requires: rsync
+Requires: rsync, jq
 
 %description
 This rpm contains the necessary helm charts to deploy the caas subsystem.
@@ -39,10 +39,12 @@ This rpm contains the necessary helm charts to deploy the caas subsystem.
 %install
 mkdir -p %{buildroot}/%{_playbooks_path}/
 rsync -av ansible/playbooks/install_caas_infra.yaml %{buildroot}/%{_playbooks_path}/
+rsync -av ansible/playbooks/infra_chart_reconfig_fluentd.yaml %{buildroot}/%{_playbooks_path}/
 
 mkdir -p %{buildroot}/%{_roles_path}/
 rsync -av ansible/roles/install_caas_infra %{buildroot}/%{_roles_path}/
 rsync -av ansible/roles/pre_install_caas_infra %{buildroot}/%{_roles_path}/
+rsync -av ansible/roles/infra_chart_reconfig %{buildroot}/%{_roles_path}/
 
 mkdir -p %{buildroot}/%{_caas_chart_path}/
 rsync -av infra-charts/* %{buildroot}/%{_caas_chart_path}/

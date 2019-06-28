@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 #}
----
 fluentd:
   image_name: {{ container_image_names | select('search', '/fluentd') | list | last }}
   apiserver_service_name: {{ caas.apiserver_service_name }}

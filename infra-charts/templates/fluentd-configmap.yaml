@@ -96,6 +96,7 @@ data:
         path /var/log/containers/*_{{ . }}_*.log
         pos_file /var/lib/fluentd/fluentd-{{ . }}.log.pos
         time_format %Y-%m-%dT%H:%M:%S.%NZ
+        refresh_interval 10
         tag kubernetes.*
         format json
         read_from_head true
@@ -122,6 +123,7 @@ data:
         path /var/log/containers/*_{{ $element.namespace }}-{{ $index }}_*.log
         pos_file /var/lib/fluentd/fluentd-{{ $element.namespace }}-{{ $index }}.log.pos
         time_format %Y-%m-%dT%H:%M:%S.%NZ
+        refresh_interval 10
         tag kubernetes.*
         format json
         read_from_head true

@@ -49,11 +49,9 @@ install -m 0700 utils/deploy/merge_image.sh %{buildroot}/%{_caas_libexec_path}/
 mkdir -p %{buildroot}/etc/systemd/system/
 # --------------------------- COMMON
 mkdir -p %{buildroot}/etc/profile.d/
-install -m 0644 utils/common/aliases.sh %{buildroot}/etc/profile.d/
 
 %files
 %{_caas_libexec_path}/merge_image.sh
-/etc/profile.d/aliases.sh
 /etc/logrotate.d/kubelet-plugins
 %exclude %{_caas_libexec_path}/*pyc
 %exclude %{_caas_libexec_path}/*pyo
@@ -81,8 +79,6 @@ if [ $1 == 0 ]; then
 /usr/bin/systemctl daemon-reload
 # --------------------------- DEPLOY
 # --------------------------- COMMON
-  rm -rf /etc/profile.d/aliases.sh
-
 fi
 
 

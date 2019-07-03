@@ -112,3 +112,7 @@ cpu_allocation_mapping:
     pool_name: shared_caas
   caas_default:
     pool_name: default
+swift_credential:
+  user: admin
+  tenant: admin
+  password: willbechanged

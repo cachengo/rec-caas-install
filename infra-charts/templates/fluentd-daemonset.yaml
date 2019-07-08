@@ -63,7 +63,7 @@ spec:
           - name:  KUBERNETES_SERVICE_PORT
             value: "{{ .Values.fluentd.apiserver_svc_port }}"
           - name:  FLUENT_ELASTICSEARCH_HOST
-            value: {{ .Values.elasticsearch.host }}
+            value: {{ .Values.elasticsearch.url }}
           - name:  FLUENT_ELASTICSEARCH_PORT
             value: "{{ .Values.elasticsearch.port }}"
           - name: FLUENT_ELASTICSEARCH_SCHEME

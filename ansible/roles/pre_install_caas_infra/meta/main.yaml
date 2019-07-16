@@ -14,6 +14,22 @@
 # limitations under the License.
 
 dependencies:
+  - role: creategroup
+    _name: danm
+    _gid: "{{ caas.uid.danm }}"
+    become: true
+    become_user: "root"
+
+  - role: createuser
+    _name: danm
+    _group: danm
+    _groups: ''
+    _shell: /sbin/nologin
+    _home: /
+    _uid: "{{ caas.uid.danm }}"
+    become: true
+    become_user: "root"
+
   - role: cert
     instance: "cpuwebhook"
     cert_name: "cpuwebhook.crt"
@@ -23,6 +39,21 @@ dependencies:
       dns:
         - "cpu-dev-pod-mutator-svc.kube-system.svc.{{ caas.dns_domain }}"
         - "cpu-dev-pod-mutator-svc.kube-system.svc"
+    become: true
+    become_user: "root"
+
+  - role: cert
+    instance: "danm-webhook"
+    cert_name: "danm_webhook.crt"
+    key_name: "danm_webhook.key"
+    cert_path: /etc/kubernetes/ssl
+    common_name: "danm-webhook"
+    add_users:
+      - danm
+    alt_names:
+      dns:
+        - "danm-webhook-svc.kube-system.svc.{{ caas.dns_domain }}"
+        - "danm-webhook-svc.kube-system.svc"
     become: true
     become_user: "root"
 

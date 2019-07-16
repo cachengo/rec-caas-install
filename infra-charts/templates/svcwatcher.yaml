@@ -26,13 +26,6 @@ spec:
       {{ .Values.kubernetes_component_label }}: svcwatcher
   template:
     metadata:
-      annotations:
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
       labels:
         {{ .Values.kubernetes_component_label }}: svcwatcher
     spec:

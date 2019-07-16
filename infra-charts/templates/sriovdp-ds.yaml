@@ -28,13 +28,6 @@ spec:
       name: sriovdp
   template:
     metadata:
-      annotations:
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
       labels:
         name: sriovdp
     spec:

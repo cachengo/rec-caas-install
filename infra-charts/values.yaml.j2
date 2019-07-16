@@ -59,13 +59,20 @@ cpupooler:
   cpu_poolconfigs:
     {{ ansible_local['cpu_pooler_config'] | default([]) | to_nice_yaml | indent(4) }}
 
+danm_webhook:
+  required: true
+  container_version: {{ container_image_names | select('search', '/danm-webhook') | list | last | regex_replace('.*:([\\w\\-_\\.]+)$', '\\1') }}
+  webhook_ca_bundle: {{ webhooks_ca }}
+  webhook_port: {{ caas.danm_webhook_port }}
+  webhook_target_port: {{ caas.danm_webhook_target_port }}
+
 elasticsearch:
 {% set clustermasternodes = [] -%}
 {%- for masternumber in range(groups['caas_master']|length|int) -%}
 {%- if clustermasternodes.append('elasticsearch-master-' + (masternumber|string)) -%}{%- endif -%}
 {%- endfor %}
   clustermasternodes: '{{ clustermasternodes|join(", ") }}'
-{% if caas.infra_log_store is defined and caas.infra_log_store != 'remote_syslog' %}  
+{% if caas.infra_log_store is defined and caas.infra_log_store != 'remote_syslog' %}
   required: true
 {% endif %}
   url: {{ caas.elasticsearch_url }}

@@ -32,13 +32,6 @@ spec:
       labels:
         {{ .Values.kubernetes_component_label }}: custom-metrics-apiserver
       name: custom-metrics-apiserver
-      annotations:
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
     spec:
       priorityClassName: "system-cluster-critical"
       nodeSelector:

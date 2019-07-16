@@ -23,5 +23,6 @@ infra_chart_images:
   - svcwatcher
   - netwatcher
   - fluentd
+  - danm-webhook
 infra_chart_separated_values:
   - fluentd

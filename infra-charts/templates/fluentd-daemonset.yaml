@@ -31,12 +31,6 @@ spec:
     metadata:
       annotations:
         config/timestamp: "{{ .Values.fluentd.config_timestamp }}"
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
       labels:
         {{ .Values.kubernetes_component_label }}: fluentd-logging
         version: v1

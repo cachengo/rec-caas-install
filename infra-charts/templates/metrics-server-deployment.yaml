@@ -28,13 +28,6 @@ spec:
       {{ .Values.kubernetes_component_label }}: metrics-server
   template:
     metadata:
-      annotations:
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
       name: metrics-server
       labels:
         {{ .Values.kubernetes_component_label }}: metrics-server

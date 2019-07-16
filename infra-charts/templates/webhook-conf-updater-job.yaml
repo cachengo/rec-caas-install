@@ -11,13 +11,6 @@ metadata:
 spec:
   template:
     metadata:
-      annotations:
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
     spec:
       containers:
       - name: webhook-cfg-updater

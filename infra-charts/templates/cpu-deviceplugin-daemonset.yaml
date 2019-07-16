@@ -28,13 +28,6 @@ spec:
       {{ .Values.kubernetes_component_label }}: cpu-device-plugin
   template:
     metadata:
-      annotations:
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
       labels:
         {{ .Values.kubernetes_component_label }}: cpu-device-plugin
     spec:

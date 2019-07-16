@@ -68,7 +68,7 @@ ldap_slave_url: infraldap-server-slave.kube-system.svc.{{ dns_domain }}
 apiserver_secure_port: 6443
 apiserver_svc_port: 443
 default_partition_size: 16
-danmnet_default_name: flannel
+danmnet_default_name: default
 danmnet_default_namespace: kube-system
 danmnet_default_network_id: flannel
 danmnet_default_network_type: flannel
@@ -117,3 +117,6 @@ swift_credential:
   user: admin
   tenant: admin
   password: willbechanged
+danm_crd_dir: "{{ caas_base_directory }}/crds"
+danm_webhook_port: 443
+danm_webhook_target_port: 6443

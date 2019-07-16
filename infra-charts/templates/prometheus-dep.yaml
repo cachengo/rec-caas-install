@@ -31,12 +31,6 @@ spec:
         {{ .Values.kubernetes_component_label }}: prometheus
       annotations:
         prometheus.io/scrape: 'false'
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
     spec:
       priorityClassName: "system-cluster-critical"
       nodeSelector:

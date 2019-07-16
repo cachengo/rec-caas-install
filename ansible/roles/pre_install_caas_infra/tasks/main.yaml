@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-  - name: prepare cpupooler
-    import_tasks: prepare_cpupooler.yaml
+  - name: prepare ca bundle
+    import_tasks: prepare_ca_bundle.yaml
 
   - name: prepare metrics
     import_tasks: prepare_metrics.yaml

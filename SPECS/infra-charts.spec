@@ -15,7 +15,7 @@
 %define COMPONENT infra-charts
 %define RPM_NAME caas-%{COMPONENT}
 %define RPM_MAJOR_VERSION 1.0.0
-%define RPM_MINOR_VERSION 16
+%define RPM_MINOR_VERSION 17
 
 Name:           %{RPM_NAME}
 Version:        %{RPM_MAJOR_VERSION}

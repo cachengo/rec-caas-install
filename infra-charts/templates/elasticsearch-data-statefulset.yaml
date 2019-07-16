@@ -31,13 +31,6 @@ spec:
       labels:
         app: elasticsearch-data
         component: "{{ .Values.elasticsearch.data.name }}"
-      annotations:
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
     spec:
       priorityClassName: "system-cluster-critical"
       affinity:

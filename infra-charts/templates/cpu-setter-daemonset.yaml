@@ -28,13 +28,6 @@ spec:
       {{ .Values.kubernetes_component_label }}: cpu-setter
   template:
     metadata:
-      annotations:
-        danm.k8s.io/interfaces: |
-          [
-            {
-              "network":"flannel"
-            }
-          ]
       labels:
         {{ .Values.kubernetes_component_label }}: cpu-setter
     spec:

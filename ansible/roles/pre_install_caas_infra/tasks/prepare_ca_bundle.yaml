@@ -19,7 +19,7 @@
   become_user: "root"
   no_log: true
 
-- name: set cpu_ca_bundle
+- name: set ca_bundle
   set_fact:
     webhooks_ca: "{{ temp_webhook_ca_bundle.stdout }}"
   no_log: true

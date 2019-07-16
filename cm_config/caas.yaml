@@ -27,6 +27,7 @@ libexec_dir: /usr/libexec/caas
 apiserver_in_hosts: apiserver.{{ dns_domain }}
 etcd_api_port: 4111
 etcd_peer_port: 4112
+etcd_proxy_port: 23790
 kubernetes_component_label: akrec-image
 swift_url: swift.kube-system.svc.{{ dns_domain }}
 swift_port: 8084

@@ -16,7 +16,7 @@ limitations under the License.
 {{- define "es_infra.part" }}
 {{- template "es_begin.part"}}
 {{- with . }}
-       host {{ .host }}
+       host {{ .url }}
        port {{ .port }}
        scheme {{ .scheme }}
        logstash_prefix {{ .logstash_prefix }}

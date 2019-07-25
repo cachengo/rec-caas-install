@@ -92,6 +92,13 @@ spec:
             path: /_cluster/health?local=true
             port: {{ .Values.elasticsearch.port }}
           initialDelaySeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.elasticsearch.port }}
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
         image: {{ .Values.elasticsearch.image_name }}
         command: ["/usr/bin/supervisord","-n","-c","/etc/supervisord.conf"]
         volumeMounts:

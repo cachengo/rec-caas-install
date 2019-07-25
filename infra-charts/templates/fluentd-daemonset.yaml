@@ -89,9 +89,6 @@ spec:
           mountPath: /var/log
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
-        - name: fluentd-secrets
-          mountPath: /etc/fluentd/ssl
-          readOnly: true
         - name: fluentd-config
           mountPath: /fluentd/etc
           readOnly: true

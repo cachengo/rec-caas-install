@@ -16,7 +16,7 @@
 docker_environment:
   DOCKER_HOST: "tcp://{{ networking.infra_internal.ip }}:2375"
   DOCKER_TLS_VERIFY: "1"
-  DOCKER_CERT_PATH: "/etc/docker"
+  DOCKER_CERT_PATH: "{{ caas.cert_directory }}"
 
 image_file_extension: .tar
 image_directory: "{{ caas.infra_containers_directory }}"

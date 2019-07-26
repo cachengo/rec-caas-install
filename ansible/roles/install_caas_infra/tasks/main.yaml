@@ -60,9 +60,6 @@
     delay: 5
 
   rescue:
-  - name: delete the {{ infra_chart_name }} chart
-    shell: HELM_HOST={{ caas.tiller_ip }}:{{ caas.tiller_port }} helm delete --purge {{ infra_chart_name }}
-
   - name: fail the current playbook run, because helm install failed
     fail:
       msg: "ERROR: helm install {{ infra_chart_name }} failed"

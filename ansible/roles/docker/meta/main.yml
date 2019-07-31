@@ -32,15 +32,10 @@ dependencies:
 
   - role: cert
     instance: "docker{{ nodeindex }}"
-    cert_path: /etc/docker
-    become: true
-    become_user: "root"
-
-  - role: cert
+    cert_path: "{{ caas.cert_directory }}"
     cert_name: "cert.pem"
     key_name: "key.pem"
-    instance: "docker"
-    cert_path: /etc/docker
+    common_name: "docker"
     alt_names:
       ip:
         - "{{ ansible_host }}"
@@ -48,8 +43,9 @@ dependencies:
     become_user: "root"
 
   - role: cert
-    instance: "client{{ nodeindex }}"
-    cert_path: /etc/docker
+    instance: "docker-client{{ nodeindex }}"
+    cert_path: "{{ caas.cert_path }}"
+    common_name: "docker-client"
     add_users:
       - kube
     become: true

@@ -42,5 +42,5 @@
   with_items:
     - "export DOCKER_HOST=tcp://{{ networking.infra_internal.ip }}:2375"
     - "export DOCKER_TLS_VERIFY='1'"
-    - "export DOCKER_CERT_PATH=/etc/docker"
+    - "export DOCKER_CERT_PATH={{ caas.cert_directory }}"
   become_user: "root"

@@ -57,7 +57,7 @@ Restart=on-failure
 RestartSec=1s
 Environment=DOCKER_HOST=tcp://{{ hostname|lower }}:2375
 Environment=DOCKER_TLS_VERIFY=1
-Environment=DOCKER_CERT_PATH=/etc/docker
+Environment=DOCKER_CERT_PATH={{ caas.cert_directory }}
 
 [Install]
 WantedBy=multi-user.target

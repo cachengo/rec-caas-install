@@ -16,7 +16,7 @@
 docker_environment:
   DOCKER_HOST: "tcp://{{ networking.infra_internal.ip }}:2375"
   DOCKER_TLS_VERIFY: "1"
-  DOCKER_CERT_PATH: "/etc/docker"
+  DOCKER_CERT_PATH: "{{ caas.cert_directory }}"
 
 registry: "{{ caas.registry_url }}:{{ caas.registry_port }}"
 registry_repo: "{{ caas.registry_repo }}"
